@@ -16,7 +16,7 @@
                     <span *ngIf="loginForm.controls['username'].invalid && (loginForm.controls['username'].dirty || 
                        loginForm.controls['username'].touched)" class="error">
                         <span class="text-danger" *ngIf="loginForm.controls['username'].errors?.['username']">
-                            *Please Enter Valid Email.
+                            Please Enter Valid Email.
                         </span>
                     </span>
 
@@ -39,7 +39,7 @@
                 <span *ngIf="loginForm.controls['password'].invalid && (loginForm.controls['password'].dirty || 
                            loginForm.controls['password'].touched)" class="error">
                     <span class="text-danger" *ngIf="loginForm.controls['password'].errors?.['required']">
-                        *Password is required.
+                        Password is required.
                     </span>
                 </span>
                 <div class="d-flex justify-content-center my-3">
