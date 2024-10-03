@@ -1,0 +1,17 @@
+.rounded-input {
+    border-radius: 8px; 
+    border: 1px solid #ccc; 
+    padding: 8px 12px;
+    font-size: 1rem; 
+    outline: none; 
+    transition: border-color 0.3s, box-shadow 0.3s; 
+}
+
+.rounded-input:focus {
+    border-color: #2563EB; 
+    box-shadow: 0 0 0 3px rgba(38, 143, 255, 0.25); 
+}
+
+.header-color{
+    color: #2563EB;
+}

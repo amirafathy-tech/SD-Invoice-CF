@@ -1,0 +1,690 @@
+<div class="card">
+    <p-toast></p-toast>
+    <p-toolbar>
+        <div class="p-toolbar-group-start">
+            <h6>1.0 Excavation</h6>
+        </div>
+        <div class="p-toolbar-group-end">
+            <!-- <button pButton pRipple icon="pi pi-copy" (click)="copyRecord()" class="p-button-rounded m-2"></button> -->
+            <button pButton size="small" icon="pi pi-trash" (click)="deleteRecord()" severity="danger"
+                class="m-2"></button>
+            <button pButton icon="pi pi-print" size="small" class="m-2 "></button>
+            <button pButton label="Export" size="small" (click)="exportExcel()" icon="pi pi-download"
+                class="m-2"></button>
+            <button pButton label="Execution-Order" size="small" (click)="showExecutionOrderDialog()"
+                class="m-2"></button>
+        </div>
+    </p-toolbar>
+
+    <div class="text-center">
+        <div class="row justify-content-center fs-6 fw-bold">
+            <div class="col-2 col-sm-4 border">
+                Total Value:
+            </div>
+            <div class="col-2 col-sm-4 border">
+                {{totalValue | currency }}
+            </div>
+            <div class="col-2 col-sm-4 border">
+                Currency
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-toast></p-toast>
+
+<p-table [value]="serviceInvoiceRecords |search:searchKey" dataKey="serviceInvoiceCode" [resizableColumns]="true"
+    editMode="row" selectionMode="multiple" [(selection)]="selectedServiceInvoice" [rowHover]="true" [rows]="10"
+    [showCurrentPageReport]="true" [rowsPerPageOptions]="[10, 25, 50]" [loading]="loading" [paginator]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [filterDelay]="0">
+
+    <ng-template pTemplate="caption">
+        <div class="flex flex-wrap justify-content-between gap-2">
+            <div class="border border-primary rounded">
+                <div fd-form-item>
+                    <fd-input-group type="search" glyph="search" glyphAriaLabel="Search" placeholder="Search..."
+                        [button]="true" [disabled]="false" [(ngModel)]="searchKey">
+                    </fd-input-group>
+                </div>
+            </div>
+            <!-- <div>
+                <span class="p-input-icon-left">
+                    <input pInputText type="text" placeholder="Search...." [(ngModel)]="searchKey"
+                        class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary " />
+                </span>
+
+            </div> -->
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+        <tr>
+            <!-- <th style="min-width: 10rem;"> </th> -->
+            <th style="min-width: 10rem;">
+                <!-- <p-checkbox (onChange)="onSelectAllRecords($event)" [value]="invoicesRecords"></p-checkbox> -->
+            </th>
+            <th style="min-width: 10rem;">Print </th>
+            <th style="min-width: 10rem;">Line.NR</th>
+
+            <th style="min-width: 10rem;"> MainItem.No </th>
+            <!-- <th style="min-width: 10rem;"> SubItem.No </th> -->
+            <th style="min-width: 10rem;">ServiceNO.</th>
+            <th style="min-width: 10rem;">Description</th>
+
+            <th style="min-width: 10rem;">UOM</th>
+            <th style="min-width: 10rem;">AmountPerUnit</th>
+            <th style="min-width: 10rem;">Currency</th>
+            <th style="min-width: 10rem;">Total</th>
+
+            <th style="min-width: 10rem;">Total Quantity</th>
+            <th style="min-width: 10rem;"> Quantity </th>
+            <th style="min-width: 10rem;"> Remaining Quantity </th>
+            <th style="min-width: 10rem;">Actual Quantity</th>
+            <th style="min-width: 10rem;">Actual Percentage %</th>
+
+            <th style="min-width: 10rem;"> MaterialGrp</th>
+            <th style="min-width: 10rem;"> ServiceType</th>
+            <th style="min-width: 10rem;">External ServiceNumber</th>
+            <th style="min-width: 10rem;">ServiceText</th>
+            <th style="min-width: 10rem;">LineText</th>
+            <th style="min-width: 10rem;"> Personnel.NR</th>
+            <th style="min-width: 10rem;">LineType</th>
+
+            <th style="min-width: 10rem;"> Bidders’ line</th>
+            <th style="min-width: 10rem;">Supplementary Line</th>
+            <th style="min-width: 10rem;">LotCostOne</th>
+            <th style="min-width: 10rem;">Actions</th>
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-mainItem let-editing="editing" let-ri="rowIndex">
+        <tr [pEditableRow]="mainItem">
+
+            <td style="min-width: 10rem;">
+                <p-tableCheckbox [value]="mainItem" />
+                <!-- 
+                <p-checkbox [value]="mainItem" [(ngModel)]="mainItem.selected"
+                    (onChange)="onMainItemSelection($event, mainItem)"></p-checkbox> -->
+            </td>
+            <td style="min-width: 10rem;">
+                <p-checkbox [value]="mainItem" [(ngModel)]="mainItem.doNotPrint"
+                    (onChange)="onMainItemSelection($event, mainItem)"></p-checkbox>
+            </td>
+            <td style="min-width: 10rem;">
+                <!-- Line Number -->
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputNumber name="lineNumber" class="rounded-input" disabled type="text"
+                            [(ngModel)]="mainItem.lineNumber">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{ mainItem.lineNumber }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+
+            <td style="min-width: 10rem;">
+                {{ rowIndex + ri + 1 }}
+
+            </td>
+            <td style="min-width: 10rem;">
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        {{mainItem.serviceNumberCode}}
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{mainItem.serviceNumberCode}}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        {{ mainItem.description }}
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{ mainItem.description }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        {{ mainItem.unitOfMeasurementCode }}
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{ mainItem.unitOfMeasurementCode }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        {{ mainItem.amountPerUnit }}
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{ mainItem.amountPerUnit }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        {{ mainItem.currencyCode }}
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{ mainItem.currencyCode }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        {{ mainItem.total }}
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{ mainItem.total }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        {{ mainItem.totalQuantity }}
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{ mainItem.totalQuantity }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <!--  Quantuty will be changed-->
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputNumber class="rounded-input" name="quantity" type="number" [min]="0"
+                            [(ngModel)]="mainItem.quantity">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{ mainItem.quantity }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <!-- Remaining Quantuty -->
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        {{ mainItem.remainingQuantity }}
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{ mainItem.remainingQuantity }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <!-- Actual Quantity -->
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputNumber class="rounded-input" disabled name="actualQuantity" type="number" [min]="0"
+                            [(ngModel)]="mainItem.actualQuantity">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{ mainItem.actualQuantity }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <!-- Actual Percentage -->
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input pInputNumber class="rounded-input" disabled name="actualPercentage" type="number"
+                            [min]="0" [(ngModel)]="mainItem.actualPercentage">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        <!-- {{ mainItem.actualPercentage |percent }} -->
+                        {{ mainItem.actualPercentage? mainItem.actualPercentage+"%": ""  }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <!-- Material Grp -->
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        {{mainItem.materialGroupCode }}
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{mainItem.materialGroupCode }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <!-- Service Type will change to its attribute -->
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        {{mainItem.serviceTypeCode }}
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{mainItem.serviceTypeCode }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <!-- External Service Number -->
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        {{ mainItem.externalServiceNumber }}
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{ mainItem.externalServiceNumber }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <!-- Service Text -->
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        {{ mainItem.serviceText }}
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{ mainItem.serviceText }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <!--  Line Text -->
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        {{ mainItem.lineText }}
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{ mainItem.lineText }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <!-- Personnel Number -->
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        {{ mainItem.personnelNumberCode }}
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{ mainItem.personnelNumberCode }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <!-- Line Type -->
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        {{ mainItem.lineTypeCode }}
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{ mainItem.lineTypeCode }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <!-- Bidders Line -->
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input name="biddersLine" disabled [(ngModel)]="mainItem.biddersLine" type="checkbox">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{ mainItem.biddersLine }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <!--  Supplementary Line  -->
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input name="supplementaryLine" disabled [(ngModel)]="mainItem.supplementaryLine"
+                            type="checkbox">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{ mainItem.supplementaryLine }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <!-- Lot Cost One -->
+                <p-cellEditor>
+                    <ng-template pTemplate="input">
+                        <input name="lotCostOne" disabled [(ngModel)]="mainItem.lotCostOne" type="checkbox">
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                        {{ mainItem.lotCostOne }}
+                    </ng-template>
+                </p-cellEditor>
+            </td>
+            <td style="min-width: 10rem;">
+                <div class="flex align-items-center justify-content-center gap-2">
+                    <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil"
+                        (click)="onMainItemEditInit(mainItem)" class="p-button-rounded p-button-text"></button>
+                    <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check"
+                        (click)="onMainItemEditSave(mainItem.serviceInvoiceCode,mainItem)"
+                        class="p-button-rounded p-button-text p-button-success mr-2"></button>
+                    <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times"
+                        (click)="onMainItemEditCancel(mainItem, ri)"
+                        class="p-button-rounded p-button-text p-button-danger"></button>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+
+
+    <ng-template pTemplate="footer" class="m-3">
+        <ng-container *ngIf="selectedExecutionOrders">
+            <tr *ngFor="let mainItem of selectedExecutionOrders">
+                <td style="min-width: 10rem;">
+                    <!-- <button pButton type="button" icon="pi pi-times" class="p-button-danger w-3 h-1" 
+                        (click)="cancelMainItem(mainItem)">
+                    </button> -->
+                </td>
+                <td style="min-width: 10rem;"> </td>
+                <td style="min-width: 10rem;">
+                    <p-cellEditor>
+                        <ng-template pTemplate="input">
+                            <input pInputNumber name="lineNumber" class="rounded-input" disabled type="text"
+                                [(ngModel)]="mainItem.lineNumber">
+
+                        </ng-template>
+                        <ng-template pTemplate="output">
+                            {{ mainItem.lineNumber }}
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td style="min-width: 10rem;"></td>
+                <td style="min-width: 10rem;">
+                    {{mainItem.serviceNumberCode}}
+                </td>
+                <td style="min-width: 10rem;">
+                    {{ mainItem.description }}
+                </td>
+                <td style="min-width: 10rem;">
+                    {{mainItem.unitOfMeasurementCode}}
+                </td>
+                <td style="min-width: 10rem;">
+                    {{mainItem.amountPerUnit}}
+                </td>
+                <td style="min-width: 10rem;">
+                    {{mainItem.currencyCode}}
+                </td>
+                <td style="min-width: 10rem;">
+                    {{mainItem.total}}
+                </td>
+                <td style="min-width: 10rem;">
+                    {{mainItem.totalQuantity}}
+                </td>
+                <td style="min-width: 10rem;">
+                    <input pInputNumber class="rounded-input" name="serviceQuantity" type="number" [min]="0"
+                    (keyup.enter)="saveMainItem(mainItem)" [(ngModel)]="mainItem.serviceQuantity">
+                </td>
+                <td style="min-width: 10rem;">
+                    <input pInputNumber class="rounded-input" disabled name="remainingQuantity" type="number" [min]="0">
+                </td>
+                <td style="min-width: 10rem;">
+                    <input pInputNumber class="rounded-input" disabled name="actualQuantity" type="number" [min]="0"
+                        >
+                        <!-- [(ngModel)]="mainItem.actualQuantity" -->
+                </td>
+                <td style="min-width: 10rem;">
+                    <input pInputNumber class="rounded-input" disabled name="actualPercentage" type="number" [min]="0"
+                       >
+                       <!-- [(ngModel)]="mainItem.actualPercentage" -->
+                </td>
+                <td style="min-width: 10rem;">
+                    {{mainItem.materialGroupCode}}
+                </td>
+                <td style="min-width: 10rem;">
+                    {{mainItem.serviceTypeCode}}
+                </td>
+                <td style="min-width: 10rem;">
+                    {{mainItem.externalServiceNumber}}
+                </td>
+                <td style="min-width: 10rem;">
+                    {{mainItem.serviceText}}
+                </td>
+                <td style="min-width: 10rem;">
+                    {{mainItem.lineText}}
+                </td>
+                <td style="min-width: 10rem;">
+                    {{mainItem.personnelNumberCode}}
+                </td>
+                <td style="min-width: 10rem;">
+                    {{mainItem.lineTypeCode}}
+                </td>
+                <td style="min-width: 10rem;">
+                    <input pInputText name="biddersLine" disabled type="checkbox" [(ngModel)]="mainItem.biddersLine">
+                </td>
+                <td style="min-width: 10rem;">
+                    <input pInputText name="supplementaryLine" disabled type="checkbox"
+                        [(ngModel)]="mainItem.supplementaryLine">
+                </td>
+                <td style="min-width: 10rem;">
+                    <input pInputText name="lotCostOne" disabled type="checkbox" [(ngModel)]="mainItem.lotCostOne">
+                </td>
+                <td style="min-width: 10rem;">
+                    <div class="flex align-items-center justify-content-center gap-2">
+                        <button pButton type="button" icon="pi pi-plus" class="ui-button-info" label="Save"
+                            (click)="saveMainItem(mainItem)">
+                        </button>
+                        <button pButton type="button" icon="pi pi-times" class="p-button-danger" label="Cancel"
+                            (click)="cancelMainItemExecutionOrder(mainItem)">
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </ng-container>
+
+        <tr>
+            <td style="min-width: 10rem;">
+            </td>
+            <td style="min-width: 10rem;">
+            </td>
+            <!-- Line Number -->
+            <td style="min-width: 10rem;">
+                <input pInputText name="lineNumber" type="text" [(ngModel)]="lineNumber"
+                    (keyup.enter)="searchLineNumber(lineNumber)" placeholder="Enter LineNumber..."
+                    class="rounded-input">
+            </td>
+            <td style="min-width: 10rem;">
+            </td>
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    {{executionOrderWithlineNumber.serviceNumberCode}}
+                </ng-container>
+            </td>
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    {{ executionOrderWithlineNumber.description }}
+                </ng-container>
+            </td>
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    {{executionOrderWithlineNumber.unitOfMeasurementCode}}
+                </ng-container>
+            </td>
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    {{executionOrderWithlineNumber.amountPerUnit}}
+                </ng-container>
+            </td>
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    {{executionOrderWithlineNumber.currencyCode}}
+                </ng-container>
+            </td>
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    {{executionOrderWithlineNumber.total}}
+                </ng-container>
+            </td>
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    {{executionOrderWithlineNumber.totalQuantity}}
+                </ng-container>
+            </td>
+            <!--   Quantity will be changed -->
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    <input pInputNumber name="serviceQuantity" type="number" [min]="0"
+                    (keyup.enter)="addMainItem()"   [(ngModel)]="executionOrderWithlineNumber.serviceQuantity" class="rounded-input">
+                </ng-container>
+            </td>
+            <!-- Remaining  Quantity will be changed -->
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    <input pInputNumber class="rounded-input" disabled name="remainingQuantity" type="number" [min]="0"
+                        >
+                        <!-- [(ngModel)]="executionOrderWithlineNumber.remainingQuantity" -->
+                </ng-container>
+            </td>
+            <!-- Actual Quantity -->
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    <input pInputNumber class="rounded-input" disabled name="actualQuantity" type="number" [min]="0"
+                       >
+                       <!-- [(ngModel)]="executionOrderWithlineNumber.actualQuantity" -->
+                </ng-container>
+            </td>
+            <!-- Actual Percentage -->
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    <input pInputNumber class="rounded-input" disabled name="actualPercentage" type="number" [min]="0"
+                       >
+                       <!-- [(ngModel)]="executionOrderWithlineNumber.actualPercentage" -->
+                </ng-container>
+            </td>
+            <!-- Material Grp -->
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    {{executionOrderWithlineNumber.materialGroupCode}}
+                </ng-container>
+            </td>
+            <!-- Service Type  -->
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    {{executionOrderWithlineNumber.serviceTypeCode}}
+                </ng-container>
+            </td>
+            <!-- External Service Number -->
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    {{executionOrderWithlineNumber.externalServiceNumber}}
+                </ng-container>
+            </td>
+            <!-- Service Text -->
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    {{executionOrderWithlineNumber.serviceText}}
+                </ng-container>
+            </td>
+            <!--  Line Text -->
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    {{executionOrderWithlineNumber.lineText}}
+                </ng-container>
+            </td>
+            <!-- Personnel Number -->
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    {{executionOrderWithlineNumber.personnelNumberCode}}
+                </ng-container>
+            </td>
+            <!-- Line Type -->
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    {{executionOrderWithlineNumber.lineTypeCode}}
+                </ng-container>
+            </td>
+            <!-- Bidders Line -->
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    <input pInputText name="biddersLine" disabled type="checkbox"
+                        [(ngModel)]="executionOrderWithlineNumber.biddersLine">
+                </ng-container>
+            </td>
+            <!--  Supplementary Line  -->
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    <input pInputText name="supplementaryLine" disabled type="checkbox"
+                        [(ngModel)]="executionOrderWithlineNumber.supplementaryLine">
+                </ng-container>
+            </td>
+            <!-- Lot Cost One -->
+            <td style="min-width: 10rem;">
+                <ng-container *ngIf="executionOrderWithlineNumber">
+                    <input pInputText name="lotCostOne" disabled type="checkbox"
+                        [(ngModel)]="executionOrderWithlineNumber.lotCostOne">
+                </ng-container>
+            </td>
+            <td style="min-width: 10rem;">
+                <button pButton type="button" icon="pi pi-plus" class="ui-button-info" label="Save"
+                    (click)="addMainItem()">
+                </button>
+            </td>
+        </tr>
+
+    </ng-template>
+
+</p-table>
+
+
+<p-dialog header="Select Rows to Copy:" class="header-color" [(visible)]="displayExecutionOrderDialog" [modal]="true"
+    [style]="{width: '70vw'}" [responsive]="true">
+    <p-table [value]="executionOrders" selectionMode="multiple" [(selection)]="selectedExecutionOrders"
+        dataKey="executionOrderMainCode">
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Selection</th>
+                <th>MainItem.NO</th>
+                <th>Line.Number</th>
+                <th>Service Number</th>
+                <th>Description</th>
+                <th>UOM</th>
+                <th>Total Quantity</th>
+                <!-- <th>ServiceInvoice Quantity</th> -->
+                <th>AmountPerUnit</th>
+                <th>Actual Quantity</th>
+                <th>OverFulfillment</th>
+
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-mainItem let-ri="rowIndex">
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="mainItem" />
+                </td>
+                <td>
+                    {{ ri + 1 }}
+                </td>
+                <td> {{mainItem.lineNumber}}</td>
+                <td>
+                    {{ mainItem.serviceNumberCode }}
+                </td>
+                <td>
+                    {{ mainItem.description }}
+                </td>
+                <td>
+                    {{ mainItem.unitOfMeasurementCode }}
+                </td>
+                <td> {{mainItem.totalQuantity}}</td>
+                <!-- <td> <input pInputNumber name="quantity" type="number" [min]="0"></td> -->
+                <td> {{mainItem.amountPerUnit}}</td>
+                <td> {{mainItem.actualQuantity}}</td>
+                <td> {{mainItem.OverFulfillment}}</td>
+
+
+            </tr>
+        </ng-template>
+    </p-table>
+    <p-footer>
+        <button pButton type="button" (click)="saveSelection()" label="Copy"></button>
+        <button pButton type="button" (click)="displayExecutionOrderDialog = false" label="Cancel"
+            class="p-button-secondary"></button>
+    </p-footer>
+</p-dialog>
+
+
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
