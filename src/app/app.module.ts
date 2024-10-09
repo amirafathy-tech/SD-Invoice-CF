@@ -40,6 +40,7 @@ import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinne
 //import { AlertComponent } from './shared/alert/alert.component';
 import { SearchPipe } from './pipes/search.pipe';
 import { ServiceInvoiceComponent } from './service-invoice/service-invoice.component';
+import { HomePageComponent } from './home-page/home-page.component';
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { ServiceInvoiceComponent } from './service-invoice/service-invoice.compo
     LoadingSpinnerComponent,
     SearchPipe,
     ServiceInvoiceComponent,
+    HomePageComponent,
 
   ],
   imports: [

@@ -18,6 +18,8 @@ export class MainItemExecutionOrder {
     lineTypeCode?:string;
 
     serviceQuantity?:number;
+
+    remainingQuantity?:number;
     
     totalQuantity?: number;
     amountPerUnit?: number;

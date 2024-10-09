@@ -64,10 +64,10 @@
                 <!-- <p-checkbox (onChange)="onSelectAllRecords($event)" [value]="invoicesRecords"></p-checkbox> -->
             </th>
             <th style="min-width: 10rem;">Print </th>
-            <th style="min-width: 10rem;">Line.NR</th>
+           
 
             <th style="min-width: 10rem;"> MainItem.No </th>
-            <!-- <th style="min-width: 10rem;"> SubItem.No </th> -->
+            <th style="min-width: 10rem;">Line.NR</th>
             <th style="min-width: 10rem;">ServiceNO.</th>
             <th style="min-width: 10rem;">Description</th>
 
@@ -110,6 +110,12 @@
                 <p-checkbox [value]="mainItem" [(ngModel)]="mainItem.doNotPrint"
                     (onChange)="onMainItemSelection($event, mainItem)"></p-checkbox>
             </td>
+           
+
+            <td style="min-width: 10rem;">
+                {{ rowIndex + ri + 1 }}
+
+            </td>
             <td style="min-width: 10rem;">
                 <!-- Line Number -->
                 <p-cellEditor>
@@ -121,11 +127,6 @@
                         {{ mainItem.lineNumber }}
                     </ng-template>
                 </p-cellEditor>
-            </td>
-
-            <td style="min-width: 10rem;">
-                {{ rowIndex + ri + 1 }}
-
             </td>
             <td style="min-width: 10rem;">
                 <p-cellEditor>
@@ -381,6 +382,7 @@
                     </button> -->
                 </td>
                 <td style="min-width: 10rem;"> </td>
+                <td style="min-width: 10rem;"></td>
                 <td style="min-width: 10rem;">
                     <p-cellEditor>
                         <ng-template pTemplate="input">
@@ -393,7 +395,6 @@
                         </ng-template>
                     </p-cellEditor>
                 </td>
-                <td style="min-width: 10rem;"></td>
                 <td style="min-width: 10rem;">
                     {{mainItem.serviceNumberCode}}
                 </td>
@@ -481,13 +482,14 @@
             </td>
             <td style="min-width: 10rem;">
             </td>
-            <!-- Line Number -->
+          
             <td style="min-width: 10rem;">
+            </td>
+              <!-- Line Number -->
+              <td style="min-width: 10rem;">
                 <input pInputText name="lineNumber" type="text" [(ngModel)]="lineNumber"
                     (keyup.enter)="searchLineNumber(lineNumber)" placeholder="Enter LineNumber..."
                     class="rounded-input">
-            </td>
-            <td style="min-width: 10rem;">
             </td>
             <td style="min-width: 10rem;">
                 <ng-container *ngIf="executionOrderWithlineNumber">

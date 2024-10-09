@@ -5,10 +5,13 @@ import { AppComponent } from './app.component';
 import { AuthComponent } from './auth/auth.component';
 import { AuthGuard } from './auth/auth.guard';
 import { ServiceInvoiceComponent } from './service-invoice/service-invoice.component';
+import { HomePageComponent } from './home-page/home-page.component';
 
 
 const routes: Routes = [
-  { path: '', component: AppComponent },
+  // { path: '', component: AppComponent },
+  { path: '', redirectTo: '/home', pathMatch: 'full' }, 
+  { path: 'home', component: HomePageComponent },
   { path: 'login', component: AuthComponent },
   { path: 'service-invoice',canActivate:[AuthGuard], component: ServiceInvoiceComponent }
   //data: { role: ['Admin', 'Manager'] } // for auth role:
