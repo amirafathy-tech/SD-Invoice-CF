@@ -467,10 +467,10 @@
                 <td style="min-width: 10rem;">
                     <div class="flex align-items-center justify-content-center gap-2">
                         <button pButton type="button" icon="pi pi-plus" class="ui-button-info" label="Save"
-                            (click)="saveMainItem(mainItem)">
+                        style=" border-radius: 8px; " (click)="saveMainItem(mainItem)">
                         </button>
                         <button pButton type="button" icon="pi pi-times" class="p-button-danger" label="Cancel"
-                            (click)="cancelMainItemExecutionOrder(mainItem)">
+                        style=" border-radius: 8px; " (click)="cancelMainItemExecutionOrder(mainItem)">
                         </button>
                     </div>
                 </td>
@@ -622,7 +622,7 @@
             </td>
             <td style="min-width: 10rem;">
                 <button pButton type="button" icon="pi pi-plus" class="ui-button-info" label="Save"
-                    (click)="addMainItem()">
+                style=" border-radius: 8px; " (click)="addMainItem()">
                 </button>
             </td>
         </tr>
@@ -682,8 +682,8 @@
         </ng-template>
     </p-table>
     <p-footer>
-        <button pButton type="button" (click)="saveSelection()" label="Copy"></button>
-        <button pButton type="button" (click)="displayExecutionOrderDialog = false" label="Cancel"
+        <button pButton type="button" (click)="saveSelection()" style=" border-radius: 8px; margin-right: 3px;  " label="Copy"></button>
+        <button pButton type="button" (click)="displayExecutionOrderDialog = false" style=" border-radius: 8px; " label="Cancel"
             class="p-button-secondary"></button>
     </p-footer>
 </p-dialog>
