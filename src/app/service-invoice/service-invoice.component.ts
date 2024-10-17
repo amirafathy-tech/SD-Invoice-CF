@@ -248,6 +248,11 @@ export class ServiceInvoiceComponent {
   saveMainItem(mainItem: MainItemExecutionOrder) {
     console.log(mainItem);
     const newRecord = {
+     // executionOrderMainCode:mainItem.executionOrderMainCode,
+     executionOrderMain:mainItem,
+
+
+     
       serviceNumberCode: mainItem.serviceNumberCode,
       description: mainItem.description,
       unitOfMeasurementCode: mainItem.unitOfMeasurementCode,

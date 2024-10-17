@@ -39,12 +39,12 @@ export class RegisterComponent implements OnInit {
         // this.alertService.clear();
         this.loading = true;
         this.authService.signUp(userData.value.email,userData.value.lastName,userData.value.firstName,userData.value.username)
-            .pipe(first())
+            // .pipe(first())
             .subscribe({
                 next: (response) => {
                     console.log(response);
                     this.showPopup=true;
-                    this.router.navigate(['/login']);
+                    // this.router.navigate(['/login']);
                     // this.alertService.success('Registration Successful', { keepAfterRouteChange: true });
                     //this.router.navigate(['/login'], { relativeTo: this.route });
                     this.loading = false;
@@ -70,5 +70,6 @@ export class RegisterComponent implements OnInit {
     showPopup: boolean = false;
     closePopup() {
       this.showPopup = false;
+      this.router.navigate(['/login']);
   }
 }
