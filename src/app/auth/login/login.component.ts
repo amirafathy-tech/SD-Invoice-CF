@@ -56,7 +56,7 @@ export class LoginComponent implements OnInit {
           localStorage.setItem('token', res.id_token);
           this.authService.loggedInUser.next(user);
           //this.loading = false;
-          this.router.navigate(['/service-invoice']);
+          this.router.navigate(['/service-invoice-data']);
         },
         error: (error) => {
           console.log(error);
