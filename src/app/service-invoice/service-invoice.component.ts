@@ -351,7 +351,7 @@ export class ServiceInvoiceComponent {
                 this.savedServiceInvoice = undefined;
               }
             });
-            this.selectedExecutionOrders = [];
+           // this.selectedExecutionOrders = [];
           }
 
         }

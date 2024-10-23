@@ -13,15 +13,13 @@ export class ApiService {
  
 private baseUrl = "https://express-proxy-app.cfapps.us10-001.hana.ondemand.com/api"
 
+//private baseUrl = "https://proxy-app.cfapps.us10-001.hana.ondemand.com/api"
+
   constructor(private http: HttpClient) { }
 
   get<T>(url: string, queryParam?: string, headers?: HttpHeaders): Observable<T> {
     let params = new HttpParams();
-
-    // headers =new HttpHeaders().set('Authorization',`Bearer ${ localStorage.getItem('token')}`)
-    
     if (queryParam) {
-      // params = params.set('keyword', queryParam);
       params = params.set('lineNumber', queryParam);
       console.log(params);
     }
@@ -30,9 +28,6 @@ private baseUrl = "https://express-proxy-app.cfapps.us10-001.hana.ondemand.com/a
   }
   
   getID<T>(url: string, id: number, params?: HttpParams, headers?: HttpHeaders): Observable<T> {
-    //const options = { params, headers };
-    
-    //headers =new HttpHeaders().set('Authorization',`Bearer ${ localStorage.getItem('token')}`)
     console.log(this.http.get<T>(`${this.baseUrl}/${url}/${id}`));
     return this.http.get<T>(`${this.baseUrl}/${url}/${id}`);
   }
