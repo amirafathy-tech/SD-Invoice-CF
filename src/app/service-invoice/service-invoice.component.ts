@@ -19,6 +19,7 @@ export class ServiceInvoiceComponent {
   //cloud data:
   documentNumber!:number;
   itemNumber!:number;
+  customerId!:number;
 
   public rowIndex = 0;
   executionOrders: MainItemExecutionOrder[] = [];
@@ -39,7 +40,8 @@ export class ServiceInvoiceComponent {
   constructor(private router:Router,private _ApiService: ApiService, private _ServiceInvoiceService: ServiceInvoiceService, private messageService: MessageService, private confirmationService: ConfirmationService) {
     this.documentNumber = this.router.getCurrentNavigation()?.extras.state?.['documentNumber'];
     this.itemNumber = this.router.getCurrentNavigation()?.extras.state?.['itemNumber'];
-    console.log(this.documentNumber,this.itemNumber);
+    this.customerId= this.router.getCurrentNavigation()?.extras.state?.['customerId'];
+    console.log(this.documentNumber,this.itemNumber,this.customerId);
    }
 
   ngOnInit() {
@@ -92,7 +94,7 @@ export class ServiceInvoiceComponent {
       console.log(filteredRecord);
       // this._ApiService.patch<MainItemServiceInvoice>('serviceinvoice', record.serviceInvoiceCode, filteredRecord).subscribe({
       
-      this._ApiService.update<MainItemServiceInvoice>(`serviceinvoice/${this.documentNumber}/${this.itemNumber}/20/1/59100002`, filteredRecord).subscribe({
+      this._ApiService.update<MainItemServiceInvoice>(`serviceinvoice/${this.documentNumber}/${this.itemNumber}/20/1/${this.customerId}`, filteredRecord).subscribe({
         next: (res) => {
           console.log('serviceInvoice  updated:', res);
           this.savedServiceInvoice = res;
@@ -218,7 +220,7 @@ export class ServiceInvoiceComponent {
         console.log(filteredRecord);
         // this._ApiService.post<MainItemServiceInvoice>('serviceinvoice', filteredRecord).subscribe({
         
-        this._ApiService.update<MainItemServiceInvoice>(`serviceinvoice/${this.documentNumber}/${this.itemNumber}/20/1/59100002`, filteredRecord).subscribe({
+        this._ApiService.update<MainItemServiceInvoice>(`serviceinvoice/${this.documentNumber}/${this.itemNumber}/20/1/${this.customerId}`, filteredRecord).subscribe({
           next: (res) => {
             console.log('serviceInvoice created:', res);
             this.savedServiceInvoice = res;
@@ -317,7 +319,7 @@ export class ServiceInvoiceComponent {
       );
       console.log(filteredRecord);
       // this._ApiService.post<MainItemServiceInvoice>('serviceinvoice', filteredRecord).subscribe({
-        this._ApiService.update<MainItemServiceInvoice>(`serviceinvoice/${this.documentNumber}/${this.itemNumber}/20/1/59100002`, filteredRecord).subscribe({
+        this._ApiService.update<MainItemServiceInvoice>(`serviceinvoice/${this.documentNumber}/${this.itemNumber}/20/1/${this.customerId}`, filteredRecord).subscribe({
         next: (res) => {
           console.log('serviceInvoice created:', res);
           this.savedServiceInvoice = res;
