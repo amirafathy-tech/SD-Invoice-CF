@@ -23,9 +23,9 @@ export class CloudDataComponent {
     item: new FormControl(null, [Validators.required, this.nonNegativeValidator()])
   });
 
-  customerId!:number;
+  customerId!: number;
 
-  constructor(private router: Router,private _ApiService: ApiService,) {
+  constructor(private router: Router, private _ApiService: ApiService,) {
   }
 
   nextPage(cloudData: FormGroup) {
@@ -34,19 +34,23 @@ export class CloudDataComponent {
 
     this._ApiService.get<any>(`serviceinvoice/${cloudData.value.document}/${cloudData.value.item}`).subscribe(response => {
       console.log(response);
-      console.log(response.d.SoldToParty);    
-      this.customerId=response.d.SoldToParty
+      console.log(response.d.SoldToParty);
+      this.customerId = response.d.SoldToParty;
+      if (this.customerId) {
+        const navigationExtras: NavigationExtras = {
+          state: {
+            documentNumber: cloudData.value.document,
+            itemNumber: cloudData.value.item,
+            customerId: this.customerId
+          }
+        };
+        console.log(navigationExtras);
+        this.router.navigate(['service-invoice'], navigationExtras);
+      }
+
     });
 
-       const navigationExtras: NavigationExtras = {
-        state: {
-         documentNumber:cloudData.value.document,
-         itemNumber:cloudData.value.item,
-         customerId:this.customerId
-        }
-      };
-      console.log(navigationExtras);
-    this.router.navigate(['service-invoice'],navigationExtras);
-  
+
+
   }
 }

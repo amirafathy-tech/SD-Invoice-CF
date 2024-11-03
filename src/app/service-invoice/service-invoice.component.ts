@@ -17,9 +17,11 @@ export class ServiceInvoiceComponent {
 
 
   //cloud data:
-  documentNumber!:number;
-  itemNumber!:number;
-  customerId!:number;
+  documentNumber!: number;
+  itemNumber!: number;
+  customerId!: number;
+  displayExecutionDocumentDialog = false;
+  executionDocumentNumber: string = '';
 
   public rowIndex = 0;
   executionOrders: MainItemExecutionOrder[] = [];
@@ -37,22 +39,83 @@ export class ServiceInvoiceComponent {
   totalValue: number = 0.0
   loading: boolean = true;
 
-  constructor(private router:Router,private _ApiService: ApiService, private _ServiceInvoiceService: ServiceInvoiceService, private messageService: MessageService, private confirmationService: ConfirmationService) {
+  constructor(private router: Router, private _ApiService: ApiService, private _ServiceInvoiceService: ServiceInvoiceService, private messageService: MessageService, private confirmationService: ConfirmationService) {
     this.documentNumber = this.router.getCurrentNavigation()?.extras.state?.['documentNumber'];
     this.itemNumber = this.router.getCurrentNavigation()?.extras.state?.['itemNumber'];
-    this.customerId= this.router.getCurrentNavigation()?.extras.state?.['customerId'];
-    console.log(this.documentNumber,this.itemNumber,this.customerId);
-   }
+    this.customerId = this.router.getCurrentNavigation()?.extras.state?.['customerId'];
+    console.log(this.documentNumber, this.itemNumber, this.customerId);
+  }
+
+
+  openDocumentDialog() {
+    this.displayExecutionDocumentDialog = true;
+  }
+
+
+  getExecutionOrdersByDocument() {
+    if (this.executionDocumentNumber) {
+      // Close the document input dialog
+      this.displayExecutionDocumentDialog = false;
+
+      // Fetch data based on document number and update the table
+      this._ApiService.get<MainItemExecutionOrder[]>(`executionordermain/${this.executionDocumentNumber}`).subscribe({
+        next: (res) => {
+          this.executionOrders = res.sort((a, b) => a.executionOrderMainCode - b.executionOrderMainCode);
+          console.log(this.executionOrders);
+          // this.ngOnInit()
+        }, error: (err) => {
+          console.log(err);
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid Data' });
+        },
+        complete: () => {
+          // this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Record updated successfully ' });
+        }
+      });
+    } else {
+      console.warn('Please enter a valid document number');
+      //this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Record added successfully ' });
+    }
+  }
+
+  getExecutionOrders() {
+  
+      this._ApiService.get<MainItemExecutionOrder[]>(`executionordermain`).subscribe({
+        next: (res) => {
+          this.executionOrders = res.sort((a, b) => a.executionOrderMainCode - b.executionOrderMainCode);
+          console.log(this.executionOrders);
+        }, error: (err) => {
+          console.log(err);
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid Data' });
+        },
+        complete: () => {
+        }
+      });
+ 
+  }
 
   ngOnInit() {
     console.log(this.selectedServiceInvoice);
-    this._ApiService.get<MainItemServiceInvoice[]>('serviceinvoice').subscribe(response => {
-      this.serviceInvoiceRecords = response.sort((a, b) => a.serviceInvoiceCode - b.serviceInvoiceCode);
-      console.log(this.serviceInvoiceRecords);
+    // /${this.documentNumber}
+    this._ApiService.get<MainItemServiceInvoice[]>(`serviceinvoice/${this.documentNumber}`).subscribe({
+      next: (res) => {
+       this.serviceInvoiceRecords = res.sort((a, b) => a.serviceInvoiceCode - b.serviceInvoiceCode);
+       console.log(this.serviceInvoiceRecords);
       this.loading = false;
       const filteredRecords = this.serviceInvoiceRecords.filter(record => record.lineTypeCode != "Contingency line");
       this.totalValue = filteredRecords.reduce((sum, record) => sum + record.total, 0);
       console.log('Total Value:', this.totalValue);
+      }, error: (err) => {
+        console.log(err);
+        console.log(err.status);
+        if(err.status == 404){
+          this.serviceInvoiceRecords=[];
+          this.loading = false;
+          this.totalValue = this.serviceInvoiceRecords.reduce((sum, record) => sum + record.total, 0);
+          console.log('Total Value:', this.totalValue);
+        }
+      },
+      complete: () => {
+      }
     });
 
     this._ApiService.get<MainItemExecutionOrder[]>('executionordermain').subscribe(response => {
@@ -93,7 +156,7 @@ export class ServiceInvoiceComponent {
       );
       console.log(filteredRecord);
       // this._ApiService.patch<MainItemServiceInvoice>('serviceinvoice', record.serviceInvoiceCode, filteredRecord).subscribe({
-      
+
       this._ApiService.update<MainItemServiceInvoice>(`serviceinvoice/${this.documentNumber}/${this.itemNumber}/20/1/${this.customerId}`, filteredRecord).subscribe({
         next: (res) => {
           console.log('serviceInvoice  updated:', res);
@@ -219,7 +282,7 @@ export class ServiceInvoiceComponent {
         );
         console.log(filteredRecord);
         // this._ApiService.post<MainItemServiceInvoice>('serviceinvoice', filteredRecord).subscribe({
-        
+
         this._ApiService.update<MainItemServiceInvoice>(`serviceinvoice/${this.documentNumber}/${this.itemNumber}/20/1/${this.customerId}`, filteredRecord).subscribe({
           next: (res) => {
             console.log('serviceInvoice created:', res);
@@ -264,8 +327,8 @@ export class ServiceInvoiceComponent {
   saveMainItem(mainItem: MainItemExecutionOrder) {
     console.log(mainItem);
     const newRecord = {
-     // executionOrderMainCode:mainItem.executionOrderMainCode,
-    // executionOrderMain:mainItem,
+      // executionOrderMainCode:mainItem.executionOrderMainCode,
+      // executionOrderMain:mainItem,
 
       serviceNumberCode: mainItem.serviceNumberCode,
       description: mainItem.description,
@@ -319,7 +382,7 @@ export class ServiceInvoiceComponent {
       );
       console.log(filteredRecord);
       // this._ApiService.post<MainItemServiceInvoice>('serviceinvoice', filteredRecord).subscribe({
-        this._ApiService.update<MainItemServiceInvoice>(`serviceinvoice/${this.documentNumber}/${this.itemNumber}/20/1/${this.customerId}`, filteredRecord).subscribe({
+      this._ApiService.update<MainItemServiceInvoice>(`serviceinvoice/${this.documentNumber}/${this.itemNumber}/20/1/${this.customerId}`, filteredRecord).subscribe({
         next: (res) => {
           console.log('serviceInvoice created:', res);
           this.savedServiceInvoice = res;
@@ -333,8 +396,8 @@ export class ServiceInvoiceComponent {
 
           // this.savedServiceInvoice=undefined;
           // this.selectedExecutionOrders = [];
-          
-           // will be commented:
+
+          // will be commented:
           if (mainItem.executionOrderMainCode && this.savedServiceInvoice) {
             //remainingQuantity: this.savedServiceInvoice.remainingQuantity
             this._ApiService.patch<MainItemExecutionOrder>('executionordermain', mainItem.executionOrderMainCode, { actualQuantity: this.savedServiceInvoice.actualQuantity, actualPercentage: this.savedServiceInvoice.actualPercentage }).subscribe({
@@ -353,7 +416,7 @@ export class ServiceInvoiceComponent {
                 this.savedServiceInvoice = undefined;
               }
             });
-           // this.selectedExecutionOrders = [];
+            // this.selectedExecutionOrders = [];
           }
 
         }

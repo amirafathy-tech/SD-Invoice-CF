@@ -634,6 +634,12 @@
 
 <p-dialog header="Select Rows to Copy:" class="header-color" [(visible)]="displayExecutionOrderDialog" [modal]="true"
     [style]="{width: '70vw'}" [responsive]="true">
+ 
+    <div class="flex align-items-center justify-content-between">
+    <button pButton type="button" label="Enter Document Number" (click)="openDocumentDialog()" style="margin-bottom: 10px;" class="rounded-input"></button>
+    <!-- <p-button icon="pi pi-refresh"  (onClick)="getExecutionOrders()" /> -->
+    <button  pButton type="button" icon="pi pi-refresh"  (click)="getExecutionOrders()" style="margin-bottom: 10px;"  class="rounded-input"></button>
+    </div>
     <p-table [value]="executionOrders" selectionMode="multiple" [(selection)]="selectedExecutionOrders"
         dataKey="executionOrderMainCode">
 
@@ -685,6 +691,21 @@
         <button pButton type="button" (click)="saveSelection()" style=" border-radius: 8px; margin-right: 3px;  " label="Copy"></button>
         <button pButton type="button" (click)="displayExecutionOrderDialog = false" style=" border-radius: 8px; " label="Cancel"
             class="p-button-secondary"></button>
+    </p-footer>
+</p-dialog>
+
+<!-- Nested Dialog for Document Number Input -->
+<p-dialog header="Enter Document Number" [(visible)]="displayExecutionDocumentDialog" [modal]="true" [style]="{width: '30vw'}" [responsive]="true">
+    <div class="flex align-items-center justify-content-between">
+    <div class="p-field">
+        <label for="executionDocumentNumber">Document Number:</label>
+        <input id="executionDocumentNumber" type="number" pInputNumber min="0" [(ngModel)]="executionDocumentNumber" class="rounded-input" />
+    </div>
+    
+    </div>
+    <p-footer>
+        <button pButton type="button" (click)="getExecutionOrdersByDocument()" style="border-radius: 8px; margin-right: 3px;" label="Fetch"></button>
+        <button pButton type="button" (click)="displayExecutionDocumentDialog = false" style="border-radius: 8px;" label="Cancel" class="p-button-secondary"></button>
     </p-footer>
 </p-dialog>
 
