@@ -78,7 +78,6 @@ export class ServiceInvoiceComponent {
   }
 
   getExecutionOrders() {
-  
       this._ApiService.get<MainItemExecutionOrder[]>(`executionordermain`).subscribe({
         next: (res) => {
           this.executionOrders = res.sort((a, b) => a.executionOrderMainCode - b.executionOrderMainCode);
@@ -92,11 +91,57 @@ export class ServiceInvoiceComponent {
       });
  
   }
+ getAppServiceInvoice(){
+  this._ApiService.get<MainItemServiceInvoice[]>(`serviceinvoice`).subscribe({
+    next: (res) => {
+     this.serviceInvoiceRecords = res.sort((a, b) => a.serviceInvoiceCode - b.serviceInvoiceCode);
+     console.log(this.serviceInvoiceRecords);
+    this.loading = false;
+    const filteredRecords = this.serviceInvoiceRecords.filter(record => record.lineTypeCode != "Contingency line");
+    this.totalValue = filteredRecords.reduce((sum, record) => sum + record.total, 0);
+    console.log('Total Value:', this.totalValue);
+    }, error: (err) => {
+      console.log(err);
+      console.log(err.status);
+      if(err.status == 404){
+        this.serviceInvoiceRecords=[];
+        this.loading = false;
+        this.totalValue = this.serviceInvoiceRecords.reduce((sum, record) => sum + record.total, 0);
+        console.log('Total Value:', this.totalValue);
+      }
+    },
+    complete: () => {
+    }
+  });
+ }  
 
   ngOnInit() {
     console.log(this.selectedServiceInvoice);
     // /${this.documentNumber}
-    this._ApiService.get<MainItemServiceInvoice[]>(`serviceinvoice/${this.documentNumber}`).subscribe({
+
+    // this._ApiService.get<MainItemServiceInvoice[]>(`serviceinvoice/${this.documentNumber}`).subscribe({
+    //   next: (res) => {
+    //    this.serviceInvoiceRecords = res.sort((a, b) => a.serviceInvoiceCode - b.serviceInvoiceCode);
+    //    console.log(this.serviceInvoiceRecords);
+    //   this.loading = false;
+    //   const filteredRecords = this.serviceInvoiceRecords.filter(record => record.lineTypeCode != "Contingency line");
+    //   this.totalValue = filteredRecords.reduce((sum, record) => sum + record.total, 0);
+    //   console.log('Total Value:', this.totalValue);
+    //   }, error: (err) => {
+    //     console.log(err);
+    //     console.log(err.status);
+    //     if(err.status == 404){
+    //       this.serviceInvoiceRecords=[];
+    //       this.loading = false;
+    //       this.totalValue = this.serviceInvoiceRecords.reduce((sum, record) => sum + record.total, 0);
+    //       console.log('Total Value:', this.totalValue);
+    //     }
+    //   },
+    //   complete: () => {
+    //   }
+    // });
+
+    this._ApiService.get<MainItemServiceInvoice[]>(`serviceinvoice`).subscribe({
       next: (res) => {
        this.serviceInvoiceRecords = res.sort((a, b) => a.serviceInvoiceCode - b.serviceInvoiceCode);
        console.log(this.serviceInvoiceRecords);
@@ -130,64 +175,75 @@ export class ServiceInvoiceComponent {
     this.clonedMainItem[record.serviceInvoiceCode] = { ...record };
   }
   onMainItemEditSave(index: number, record: MainItemServiceInvoice) {
-    let executionOrderCode: number = 0;
+    let executionOrderMainCode: number = 0;
+    let executionOrderMain :any
     console.log(record);
     if (record.lineNumber) {
       this._ApiService.get<MainItemExecutionOrder[]>('executionordermain/linenumber', record.lineNumber).subscribe(response => {
-        executionOrderCode = response[0].executionOrderMainCode
-        console.log(executionOrderCode);
-      });
-    }
-    if ((record.quantity + record.actualQuantity) > record.totalQuantity) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: ' Sum of Quantity and ActualQuantity is greater than TotalQuantity',
-        life: 8000
-      });
-    }
-    else {
-      const updatedMainItem = this.removePropertiesFrom(record, ['serviceInvoiceCode']);
-      console.log(updatedMainItem);
-      const filteredRecord = Object.fromEntries(
-        Object.entries(updatedMainItem).filter(([_, value]) => {
-          return value !== '' && value !== 0 && value !== undefined && value !== null;
-        })
-      );
-      console.log(filteredRecord);
-      // this._ApiService.patch<MainItemServiceInvoice>('serviceinvoice', record.serviceInvoiceCode, filteredRecord).subscribe({
+        executionOrderMainCode = response[0].executionOrderMainCode;
+        executionOrderMain = response[0];
+        console.log(executionOrderMain);
+        console.log(executionOrderMainCode);
 
-      this._ApiService.update<MainItemServiceInvoice>(`serviceinvoice/${this.documentNumber}/${this.itemNumber}/20/1/${this.customerId}`, filteredRecord).subscribe({
-        next: (res) => {
-          console.log('serviceInvoice  updated:', res);
-          this.savedServiceInvoice = res;
-          this.totalValue = 0;
-          this.ngOnInit()
-        }, error: (err) => {
-          console.log(err);
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid Data' });
-        },
-        complete: () => {
-          console.log(this.savedServiceInvoice);
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Record updated successfully ' });
-          // this.savedServiceInvoice=undefined;
-          // will be commented:
-          if (executionOrderCode && this.savedServiceInvoice) {
-            this._ApiService.patch<MainItemExecutionOrder>('executionordermain', executionOrderCode, { actualQuantity: this.savedServiceInvoice.actualQuantity, actualPercentage: this.savedServiceInvoice.actualPercentage }).subscribe({
-              next: (res) => {
-                console.log('execution order updated:', res);
-                this.ngOnInit()
-              }, error: (err) => {
-                console.log(err);
-              },
-              complete: () => {
-                this.savedServiceInvoice = undefined;
-              }
-            });
-          }
+        //record.executionOrderMainCode=executionOrderMainCode;
+        record.executionOrderMain=executionOrderMain;
+
+        if ((record.quantity + record.actualQuantity) > record.totalQuantity) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: ' Sum of Quantity and ActualQuantity is greater than TotalQuantity',
+            life: 8000
+          });
         }
+        else {
+          console.log(record);
+          
+          const updatedMainItem = this.removePropertiesFrom(record, ['serviceInvoiceCode']);
+          console.log(updatedMainItem);
+          const filteredRecord = Object.fromEntries(
+            Object.entries(updatedMainItem).filter(([_, value]) => {
+              return value !== '' && value !== 0 && value !== undefined && value !== null;
+            })
+          );
+          console.log(filteredRecord);
+          // this._ApiService.patch<MainItemServiceInvoice>('serviceinvoice', record.serviceInvoiceCode, filteredRecord).subscribe({
+    
+          this._ApiService.update<MainItemServiceInvoice>(`serviceinvoice/${this.documentNumber}/${this.itemNumber}/20/1/${this.customerId}`, filteredRecord).subscribe({
+            next: (res) => {
+              console.log('serviceInvoice  updated:', res);
+              this.savedServiceInvoice = res;
+              this.totalValue = 0;
+              this.ngOnInit()
+            }, error: (err) => {
+              console.log(err);
+              this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid Data' });
+            },
+            complete: () => {
+              console.log(this.savedServiceInvoice);
+              this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Record updated successfully ' });
+              // this.savedServiceInvoice=undefined;
+              // will be commented:
+              if (executionOrderMainCode && this.savedServiceInvoice) {
+                this._ApiService.patch<MainItemExecutionOrder>('executionordermain', executionOrderMainCode, { actualQuantity: this.savedServiceInvoice.actualQuantity, actualPercentage: this.savedServiceInvoice.actualPercentage }).subscribe({
+                  next: (res) => {
+                    console.log('execution order updated:', res);
+                    this.ngOnInit()
+                  }, error: (err) => {
+                    console.log(err);
+                  },
+                  complete: () => {
+                    this.savedServiceInvoice = undefined;
+                  }
+                });
+              }
+            }
+          });
+        }
+
       });
     }
+   
   }
   onMainItemEditCancel(row: MainItemServiceInvoice, index: number) {
     this.serviceInvoiceRecords[index] = this.clonedMainItem[row.serviceInvoiceCode]
@@ -225,6 +281,105 @@ export class ServiceInvoiceComponent {
 
   }
 
+  saveDocument(){
+    // if (this.selectedMainItems.length) {
+      this.confirmationService.confirm({
+        message: 'Are you sure you want to save the document?',
+        header: 'Confirm Saving ',
+       // icon: 'pi pi-exclamation-triangle',
+        accept: () => {
+
+          // get the last object of mainItemsRecords and post its total header to the cloud
+          console.log(this.serviceInvoiceRecords[this.serviceInvoiceRecords.length -1]);
+          const lastRecord= this.serviceInvoiceRecords[this.serviceInvoiceRecords.length -1];
+          //const bodyRequest=  this.removePropertiesFrom(lastRecord, ['serviceInvoiceCode']);
+         
+          
+          const totalHeader = this.totalValue;
+          //this.serviceInvoiceRecords[this.serviceInvoiceRecords.length -1].totalHeader;
+          console.log(totalHeader);
+          const bodyRequest={totalHeader:totalHeader, refrenceId:this.documentNumber,quantity:this.serviceInvoiceRecords[this.serviceInvoiceRecords.length -1].quantity,
+            amountPerUnit:this.serviceInvoiceRecords[this.serviceInvoiceRecords.length -1].amountPerUnit,
+            totalQuantity:this.serviceInvoiceRecords[this.serviceInvoiceRecords.length -1].totalQuantity,
+            unlimitedOverFulfillment:this.serviceInvoiceRecords[this.serviceInvoiceRecords.length -1].unlimitedOverFulfillment
+          }
+          console.log(bodyRequest);
+          
+          
+
+          this._ApiService.update<MainItemServiceInvoice>(`serviceinvoice/${this.documentNumber}/${this.itemNumber}/20/1/${this.customerId}`, bodyRequest).subscribe({
+            next: (res) => {
+              console.log('serviceInvoice created in s4:', res);
+             // this.savedServiceInvoice = res;
+              this.ngOnInit();
+
+              this._ApiService.updateApp<MainItemServiceInvoice>(`serviceinvoice`).subscribe({
+                next: (res) => {
+                  console.log('mainitem Updated with permanent:', res);
+                  this.totalValue = 0;
+                 // this.savedDBApp = false;
+                }, error: (err) => {
+                  console.log(err);
+                },
+                complete: () => {
+                }
+              });
+
+            }, error: (err) => {
+              console.log(err);
+            },
+            complete: () => {
+             // console.log(this.savedServiceInvoice);
+              this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Document saved successfully ' });
+    
+              // this.savedServiceInvoice=undefined;
+              // this.selectedExecutionOrders = [];
+    
+              // will be commented:
+              // if (mainItem.executionOrderMainCode && this.savedServiceInvoice) {
+              //   //remainingQuantity: this.savedServiceInvoice.remainingQuantity
+              //   this._ApiService.patch<MainItemExecutionOrder>('executionordermain', mainItem.executionOrderMainCode, { actualQuantity: this.savedServiceInvoice.actualQuantity, actualPercentage: this.savedServiceInvoice.actualPercentage }).subscribe({
+              //     next: (res) => {
+              //       console.log('execution order updated:', res);
+    
+              //       const index = this.selectedExecutionOrders.findIndex(order => order.executionOrderMainCode === mainItem.executionOrderMainCode);
+              //       if (index !== -1) {
+              //         this.selectedExecutionOrders.splice(index, 1);
+              //       }
+              //       this.ngOnInit()
+              //     }, error: (err) => {
+              //       console.log(err);
+              //     },
+              //     complete: () => {
+              //       this.savedServiceInvoice = undefined;
+              //     }
+              //   });
+              //   // this.selectedExecutionOrders = [];
+              // }
+    
+            }
+          });
+        }, reject: () => {
+          // delete the added records and get the last object of mainItemsRecords and post its total header to the cloud:
+          this._ApiService.deleteFromApp<MainItemServiceInvoice>(`serviceinvoice`).subscribe({
+            next: (res) => {
+              console.log('mainitem deleted with temporary:', res);
+              this.totalValue = 0;
+              //this.savedDBApp = false;
+  
+             // this.getCloudDocument();
+              this.messageService.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+  
+            }, error: (err) => {
+              console.log(err);
+            },
+            complete: () => {
+            }
+          });
+      }
+      });
+    //}
+  }
   // For Add new  Main Item
   addMainItem() {
     if (this.executionOrderWithlineNumber) {
@@ -282,8 +437,8 @@ export class ServiceInvoiceComponent {
         );
         console.log(filteredRecord);
         // this._ApiService.post<MainItemServiceInvoice>('serviceinvoice', filteredRecord).subscribe({
-
-        this._ApiService.update<MainItemServiceInvoice>(`serviceinvoice/${this.documentNumber}/${this.itemNumber}/20/1/${this.customerId}`, filteredRecord).subscribe({
+// update<MainItemServiceInvoice>(`serviceinvoice/${this.documentNumber}/${this.itemNumber}/20/1/${this.customerId}
+        this._ApiService.post<MainItemServiceInvoice>(`serviceinvoice`, filteredRecord).subscribe({
           next: (res) => {
             console.log('serviceInvoice created:', res);
             this.savedServiceInvoice = res;
@@ -327,8 +482,8 @@ export class ServiceInvoiceComponent {
   saveMainItem(mainItem: MainItemExecutionOrder) {
     console.log(mainItem);
     const newRecord = {
-      // executionOrderMainCode:mainItem.executionOrderMainCode,
-      // executionOrderMain:mainItem,
+      //executionOrderMainCode:mainItem.executionOrderMainCode,
+       executionOrderMain:mainItem,
 
       serviceNumberCode: mainItem.serviceNumberCode,
       description: mainItem.description,
@@ -382,11 +537,13 @@ export class ServiceInvoiceComponent {
       );
       console.log(filteredRecord);
       // this._ApiService.post<MainItemServiceInvoice>('serviceinvoice', filteredRecord).subscribe({
-      this._ApiService.update<MainItemServiceInvoice>(`serviceinvoice/${this.documentNumber}/${this.itemNumber}/20/1/${this.customerId}`, filteredRecord).subscribe({
+      // update<MainItemServiceInvoice>(`serviceinvoice/${this.documentNumber}/${this.itemNumber}/20/1/${this.customerId}
+      this._ApiService.post<MainItemServiceInvoice>(`serviceinvoice`, filteredRecord).subscribe({
         next: (res) => {
           console.log('serviceInvoice created:', res);
           this.savedServiceInvoice = res;
-          this.ngOnInit()
+          this.ngOnInit();
+          //this.getAppServiceInvoice();
         }, error: (err) => {
           console.log(err);
         },
@@ -541,6 +698,7 @@ export class ServiceInvoiceComponent {
     totalQuantity: 0,
     amountPerUnit: 0,
     total: 0,
+    totalHeader:0,
     actualQuantity: 0,
     actualPercentage: 0,
     overFulfillmentPercentage: 0,
@@ -555,7 +713,9 @@ export class ServiceInvoiceComponent {
     supplementaryLine: false,
     lotCostOne: false,
     doNotPrint: false,
-    quantity: 0
+    quantity: 0,
+
+    executionOrderMain: undefined
   };
   resetNewMainItem() {
     this.newMainItem = {
@@ -573,6 +733,7 @@ export class ServiceInvoiceComponent {
       totalQuantity: 0,
       amountPerUnit: 0,
       total: 0,
+      totalHeader:0,
       actualQuantity: 0,
       actualPercentage: 0,
       overFulfillmentPercentage: 0,
@@ -588,6 +749,7 @@ export class ServiceInvoiceComponent {
       lotCostOne: false,
       doNotPrint: false,
       quantity: 0,
+      executionOrderMain: undefined
     }
   }
 

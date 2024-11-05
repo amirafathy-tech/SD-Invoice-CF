@@ -3,6 +3,8 @@ export class MainItemServiceInvoice {
     serviceInvoiceCode: number = 0;
 
     executionOrderMainCode: number = 0;
+    executionOrderMain : any;
+
     invoiceMainItemCode?: number;
 
     serviceNumberCode?: number;
@@ -22,6 +24,8 @@ export class MainItemServiceInvoice {
     totalQuantity: number = 0;
     amountPerUnit?: number;
     total: number = 0;
+
+    totalHeader: number = 0;
 
     actualQuantity: number = 0;
     actualPercentage?: number;

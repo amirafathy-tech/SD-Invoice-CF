@@ -53,4 +53,11 @@ private baseUrl = "https://proxy-app.cfapps.us10-001.hana.ondemand.com/api"
   delete<T>(url: string, id: number, headers?: HttpHeaders): Observable<T> {
     return this.http.delete<T>(`${this.baseUrl}/${url}/${id}`);
   }
+
+  deleteFromApp<T>(url: string, headers?: HttpHeaders): Observable<T> {
+    return this.http.delete<T>(`${this.baseUrl}/${url}`);
+  }
+  updateApp<T>(url: string,body?: any,  headers?: HttpHeaders): Observable<T> {
+    return this.http.patch<T>(`${this.baseUrl}/${url}`, body);
+  }
 }
