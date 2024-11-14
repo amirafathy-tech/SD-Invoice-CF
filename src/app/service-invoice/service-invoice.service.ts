@@ -6,6 +6,23 @@ import { MainItemServiceInvoice } from './service-invoice.model';
 @Injectable()
 export class ServiceInvoiceService {
 
+
+
+  
+  private mainItems: MainItemServiceInvoice[] = [];
+
+  // Add a new MainItem
+  addMainItem(item: MainItemServiceInvoice) {
+    item.serviceInvoiceCode = this.mainItems.length + 1;
+    this.mainItems.push(item);
+    console.log(this.mainItems);
+  }
+
+   // Retrieve all MainItems
+   getMainItems(): MainItemServiceInvoice[] {
+    return this.mainItems;
+  }
+
     recordsChanged = new Subject<MainItemServiceInvoice[]>();
     startedEditing = new Subject<number>();
     constructor(private apiService: ApiService) { }

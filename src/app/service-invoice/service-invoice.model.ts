@@ -1,5 +1,7 @@
 export class MainItemServiceInvoice {
 
+    referenceId?:number;
+
     serviceInvoiceCode: number = 0;
 
     executionOrderMainCode: number = 0;
