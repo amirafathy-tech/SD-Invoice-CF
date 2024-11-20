@@ -8,8 +8,8 @@
             <!-- <button pButton pRipple icon="pi pi-copy" (click)="copyRecord()" class="p-button-rounded m-2"></button> -->
             <button pButton size="small" (click)="saveDocument()" severity="danger"
             class="m-2">Save Document</button>
-            <button pButton size="small" icon="pi pi-trash" (click)="deleteRecord()" severity="danger"
-                class="m-2"></button>
+            <!-- <button pButton size="small" icon="pi pi-trash" (click)="deleteRecord()" severity="danger"
+                class="m-2"></button> -->
             <button pButton icon="pi pi-print" size="small" class="m-2 "></button>
             <button pButton label="Export" size="small" (click)="exportExcel()" icon="pi pi-download"
                 class="m-2"></button>
@@ -49,13 +49,10 @@
                     </fd-input-group>
                 </div>
             </div>
-            <!-- <div>
-                <span class="p-input-icon-left">
-                    <input pInputText type="text" placeholder="Search...." [(ngModel)]="searchKey"
-                        class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary " />
-                </span>
-
-            </div> -->
+            <div>
+                <button pButton size="small" icon="pi pi-trash" (click)="deleteRecord()" severity="danger"
+                    class="m-2"></button>
+            </div>
         </div>
     </ng-template>
 
