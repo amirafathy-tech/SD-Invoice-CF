@@ -49,6 +49,17 @@ export class ServiceInvoiceComponent {
     console.log(this.documentNumber, this.itemNumber, this.customerId);
   }
 
+    // Initial calculation of totalValue (call this when initializing the component)
+    calculateTotalValue(): void {
+      this.totalValue = this.serviceInvoiceRecords.reduce((sum, item) => sum + (item.total || 0), 0);
+    }
+  
+    // Call this method when the mainItemsRecords array is updated
+    updateTotalValueAfterAction(): void {
+      this.calculateTotalValue();
+      console.log('Updated Total Value:', this.totalValue);
+    }
+
 
   openDocumentDialog() {
     this.displayExecutionDocumentDialog = true;
@@ -214,6 +225,8 @@ export class ServiceInvoiceComponent {
 
           //       // Ensure the array itself updates its reference
           //       this.mainItemsRecords = [...this.mainItemsRecords];
+
+                      //this.updateTotalValueAfterAction();
           //     }
           //     this.cdr.detectChanges();
           //     console.log(this.mainItemsRecords);
@@ -279,7 +292,8 @@ export class ServiceInvoiceComponent {
 
 
             this.serviceInvoiceRecords = this.serviceInvoiceRecords.filter(item => item.serviceInvoiceCode !== record.serviceInvoiceCode);
-            this.cdr.detectChanges();
+            this.updateTotalValueAfterAction();
+            //this.cdr.detectChanges();
             console.log(this.serviceInvoiceRecords);
 
             // this._ApiService.delete<MainItemServiceInvoice>('serviceinvoice', record.serviceInvoiceCode).subscribe({
@@ -356,13 +370,14 @@ export class ServiceInvoiceComponent {
         const url = `serviceinvoice?debitMemoRequest=${this.documentNumber}&debitMemoRequestItem=${this.itemNumber}&pricingProcedureStep=20&pricingProcedureCounter=1&customerNumber=${this.customerId}`;
 
         // Send the array of bodyRequest objects to the server in a single POST request
-        this._ApiService.post<MainItemServiceInvoice[]>(url, saveRequests).toPromise()
-          .then((responses) => {
-            console.log('All main items saved successfully:', responses);
-            this.ngOnInit();
-
-            // Optionally, update the saved records as persisted
-            //  unsavedItems.forEach(item => item.isPersisted = true);
+        this._ApiService.post<MainItemServiceInvoice[]>(url, saveRequests).subscribe({
+          next: (res) => {
+            console.log('All main items saved successfully:', res);
+            this.serviceInvoiceRecords = res;
+            this.updateTotalValueAfterAction();
+            // const lastRecord = res[res.length - 1];
+            // this.totalValue = 0;
+            // this.totalValue = lastRecord.totalHeader ? lastRecord.totalHeader : 0;
 
             this.messageService.add({
               severity: 'success',
@@ -370,16 +385,44 @@ export class ServiceInvoiceComponent {
               detail: 'The Document has been saved successfully',
               life: 3000
             });
-          })
-          .catch((error) => {
-            console.error('Error saving main items:', error);
+
+          }, error: (err) => {
+            console.error('Error saving main items:', err);
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
               detail: 'Error saving The Document',
               life: 3000
             });
-          });
+          },
+          complete: () => {
+            // this.ngOnInit();
+          }
+        })
+        // .toPromise()
+        //   .then((responses) => {
+        //     console.log('All main items saved successfully:', responses);
+        //     this.ngOnInit();
+
+        //     // Optionally, update the saved records as persisted
+        //     //  unsavedItems.forEach(item => item.isPersisted = true);
+
+        //     this.messageService.add({
+        //       severity: 'success',
+        //       summary: 'Success',
+        //       detail: 'The Document has been saved successfully',
+        //       life: 3000
+        //     });
+        //   })
+        //   .catch((error) => {
+        //     console.error('Error saving main items:', error);
+        //     this.messageService.add({
+        //       severity: 'error',
+        //       summary: 'Error',
+        //       detail: 'Error saving The Document',
+        //       life: 3000
+        //     });
+        //   });
 
         // // get the last object of mainItemsRecords and post its total header to the cloud
         // console.log(this.serviceInvoiceRecords[this.serviceInvoiceRecords.length - 1]);
@@ -561,7 +604,7 @@ export class ServiceInvoiceComponent {
             this._ServiceInvoiceService.addMainItem(filteredRecord);
 
             this.savedInMemory = true;
-            this.cdr.detectChanges();
+           // this.cdr.detectChanges();
 
             const newMainItems = this._ServiceInvoiceService.getMainItems();
 
@@ -570,6 +613,9 @@ export class ServiceInvoiceComponent {
               ...this.serviceInvoiceRecords.filter(item => !newMainItems.some(newItem => newItem.serviceInvoiceCode === item.serviceInvoiceCode)), // Remove existing items
               ...newMainItems
             ];
+
+            this.updateTotalValueAfterAction();
+
             console.log(this.serviceInvoiceRecords);
             this.resetNewMainItem();
             this.executionOrderWithlineNumber = undefined;
@@ -717,8 +763,6 @@ export class ServiceInvoiceComponent {
         totalQuantity: newRecord.totalQuantity,
         amountPerUnit: newRecord.amountPerUnit,
         executionOrderMainCode: newRecord.executionOrderMainCode
-
-
       };
       this._ApiService.post<any>(`/quantities`, bodyRequest).subscribe({
         next: (res) => {
@@ -738,7 +782,7 @@ export class ServiceInvoiceComponent {
           this._ServiceInvoiceService.addMainItem(filteredRecord);
 
           this.savedInMemory = true;
-          this.cdr.detectChanges();
+         // this.cdr.detectChanges();
 
           const newMainItems = this._ServiceInvoiceService.getMainItems();
 
@@ -747,6 +791,9 @@ export class ServiceInvoiceComponent {
             ...this.serviceInvoiceRecords.filter(item => !newMainItems.some(newItem => newItem.serviceInvoiceCode === item.serviceInvoiceCode)), // Remove existing items
             ...newMainItems
           ];
+
+          this.updateTotalValueAfterAction();
+
           console.log(this.serviceInvoiceRecords);
           this.resetNewMainItem();
           const index = this.selectedExecutionOrders.findIndex(order => order.executionOrderMainCode === mainItem.executionOrderMainCode);
