@@ -199,8 +199,66 @@ export class ServiceInvoiceComponent {
             Object.entries(updatedMainItem).filter(([_, value]) => {
               return value !== '' && value !== 0 && value !== undefined && value !== null;
             })
-          );
+          ) ;
           console.log(filteredRecord);
+
+          //..................
+
+        const bodyRequest: any = {
+          quantity: filteredRecord['quantity'],
+          totalQuantity: filteredRecord['totalQuantity'],
+          amountPerUnit: filteredRecord['amountPerUnit'],
+          executionOrderMainCode: filteredRecord['executionOrderMainCode'],
+          unlimitedOverFulfillment:filteredRecord['unlimitedOverFulfillment']?filteredRecord['unlimitedOverFulfillment']:false
+        };
+
+        this._ApiService.post<any>(`/quantities`, bodyRequest).subscribe({
+          next: (res) => {
+            console.log('mainitem with total:', res);
+            // this.totalValue = 0;
+            record.actualQuantity = res.actualQuantity;
+            record.remainingQuantity = res.remainingQuantity;
+            record.actualPercentage = res.actualPercentage;
+            console.log(' Record:', record);
+
+            const filteredRecord = Object.fromEntries(
+              Object.entries(record).filter(([_, value]) => {
+                return value !== '' && value !== 0 && value !== undefined && value !== null;
+              })
+            ) as MainItemServiceInvoice;
+            console.log(filteredRecord);
+
+            const mainItemIndex = this.serviceInvoiceRecords.findIndex(item => item.serviceInvoiceCode === index);
+            if (mainItemIndex > -1) {
+              console.log(filteredRecord);
+  
+              // Replace the object entirely to ensure Angular detects the change
+              this.serviceInvoiceRecords[mainItemIndex] = {
+                ...this.serviceInvoiceRecords[mainItemIndex],
+                ...filteredRecord,
+              };
+  
+              // Ensure the array itself updates its reference
+              this.serviceInvoiceRecords = [...this.serviceInvoiceRecords];
+  
+              this.updateTotalValueAfterAction();
+
+            ///.................
+            
+
+            this.updateTotalValueAfterAction();
+
+            console.log(this.serviceInvoiceRecords);
+
+          }
+         }, error: (err) => {
+            console.log(err);
+          },
+          complete: () => {
+          }
+        });
+
+        //..................
 
 
           //....................
@@ -374,6 +432,8 @@ export class ServiceInvoiceComponent {
           next: (res) => {
             console.log('All main items saved successfully:', res);
             this.serviceInvoiceRecords = res;
+            console.log(this.serviceInvoiceRecords);
+            
             this.updateTotalValueAfterAction();
             // const lastRecord = res[res.length - 1];
             // this.totalValue = 0;
@@ -579,9 +639,8 @@ export class ServiceInvoiceComponent {
           quantity: newRecord.quantity,
           totalQuantity: newRecord.totalQuantity,
           amountPerUnit: newRecord.amountPerUnit,
-          executionOrderMainCode: newRecord.executionOrderMainCode
-
-
+          executionOrderMainCode: newRecord.executionOrderMainCode,
+          unlimitedOverFulfillment:newRecord.unlimitedOverFulfillment?newRecord.unlimitedOverFulfillment:false
         };
 
         this._ApiService.post<any>(`/quantities`, bodyRequest).subscribe({
@@ -762,7 +821,9 @@ export class ServiceInvoiceComponent {
         quantity: newRecord.quantity,
         totalQuantity: newRecord.totalQuantity,
         amountPerUnit: newRecord.amountPerUnit,
-        executionOrderMainCode: newRecord.executionOrderMainCode
+        executionOrderMainCode: newRecord.executionOrderMainCode,
+        unlimitedOverFulfillment:newRecord.unlimitedOverFulfillment?newRecord.unlimitedOverFulfillment:false
+        //newRecord.unlimitedOverFulfillment
       };
       this._ApiService.post<any>(`/quantities`, bodyRequest).subscribe({
         next: (res) => {
