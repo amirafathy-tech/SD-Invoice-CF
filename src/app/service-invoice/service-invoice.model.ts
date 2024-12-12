@@ -49,6 +49,8 @@ export class MainItemServiceInvoice {
     serviceNumber?: string;
 
     selected?: boolean;
+    // debitMemoRequestItemText:string="";
+    debitMemoRequestItemText?:string;
     // executionOrdersubList?:SubItem[];
 
 }

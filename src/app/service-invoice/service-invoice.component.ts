@@ -21,6 +21,7 @@ export class ServiceInvoiceComponent {
   documentNumber!: number;
   itemNumber!: number;
   customerId!: number;
+  itemText:string="";
   displayExecutionDocumentDialog = false;
   executionDocumentNumber: string = '';
 
@@ -138,6 +139,9 @@ export class ServiceInvoiceComponent {
     this._ApiService.get<MainItemServiceInvoice[]>(`serviceinvoice/referenceid?referenceId=${this.documentNumber}`).subscribe({
       next: (res) => {
         this.serviceInvoiceRecords = res.sort((a, b) => a.serviceInvoiceCode - b.serviceInvoiceCode);
+        this.itemText=this.serviceInvoiceRecords[0].debitMemoRequestItemText?this.serviceInvoiceRecords[0].debitMemoRequestItemText:"";
+        console.log(this.itemText);
+
         console.log(this.serviceInvoiceRecords);
         this.loading = false;
         const filteredRecords = this.serviceInvoiceRecords.filter(record => record.lineTypeCode != "Contingency line");
@@ -208,11 +212,11 @@ export class ServiceInvoiceComponent {
           quantity: filteredRecord['quantity'],
           totalQuantity: filteredRecord['totalQuantity'],
           amountPerUnit: filteredRecord['amountPerUnit'],
-          executionOrderMainCode: filteredRecord['executionOrderMainCode'],
-          unlimitedOverFulfillment:filteredRecord['unlimitedOverFulfillment']?filteredRecord['unlimitedOverFulfillment']:false
+         // executionOrderMainCode: filteredRecord['executionOrderMainCode'],
+         // unlimitedOverFulfillment:filteredRecord['unlimitedOverFulfillment']?filteredRecord['unlimitedOverFulfillment']:false
         };
 
-        this._ApiService.post<any>(`/quantities`, bodyRequest).subscribe({
+        this._ApiService.post<any>(`/calculatequantities`, bodyRequest).subscribe({
           next: (res) => {
             console.log('mainitem with total:', res);
             // this.totalValue = 0;
@@ -330,6 +334,84 @@ export class ServiceInvoiceComponent {
         }
       });
     }
+    else{
+      // if ((record.quantity + record.actualQuantity) > record.totalQuantity) {
+      //   this.messageService.add({
+      //     severity: 'error',
+      //     summary: 'Error',
+      //     detail: ' Sum of Quantity and ActualQuantity is greater than TotalQuantity',
+      //     life: 8000
+      //   });
+      // }
+      // else {
+        console.log(record);
+
+        const updatedMainItem = this.removePropertiesFrom(record, ['serviceInvoiceCode']);
+        console.log(updatedMainItem);
+        const filteredRecord = Object.fromEntries(
+          Object.entries(updatedMainItem).filter(([_, value]) => {
+            return value !== '' && value !== 0 && value !== undefined && value !== null;
+          })
+        ) ;
+        console.log(filteredRecord);
+
+        //..................
+
+      const bodyRequest: any = {
+        quantity: filteredRecord['quantity'],
+        totalQuantity: filteredRecord['totalQuantity'],
+        amountPerUnit: filteredRecord['amountPerUnit'],
+       // executionOrderMainCode: filteredRecord['executionOrderMainCode'],
+       // unlimitedOverFulfillment:filteredRecord['unlimitedOverFulfillment']?filteredRecord['unlimitedOverFulfillment']:false
+      };
+
+      this._ApiService.post<any>(`/calculatequantities`, bodyRequest).subscribe({
+        next: (res) => {
+          console.log('mainitem with total:', res);
+          // this.totalValue = 0;
+          record.actualQuantity = res.actualQuantity;
+          record.remainingQuantity = res.remainingQuantity;
+          record.actualPercentage = res.actualPercentage;
+          console.log(' Record:', record);
+
+          const filteredRecord = Object.fromEntries(
+            Object.entries(record).filter(([_, value]) => {
+              return value !== '' && value !== 0 && value !== undefined && value !== null;
+            })
+          ) as MainItemServiceInvoice;
+          console.log(filteredRecord);
+
+          const mainItemIndex = this.serviceInvoiceRecords.findIndex(item => item.serviceInvoiceCode === index);
+          if (mainItemIndex > -1) {
+            console.log(filteredRecord);
+
+            // Replace the object entirely to ensure Angular detects the change
+            this.serviceInvoiceRecords[mainItemIndex] = {
+              ...this.serviceInvoiceRecords[mainItemIndex],
+              ...filteredRecord,
+            };
+
+            // Ensure the array itself updates its reference
+            this.serviceInvoiceRecords = [...this.serviceInvoiceRecords];
+
+            this.updateTotalValueAfterAction();
+
+          ///.................
+          
+
+          this.updateTotalValueAfterAction();
+
+          console.log(this.serviceInvoiceRecords);
+
+        }
+       }, error: (err) => {
+          console.log(err);
+        },
+        complete: () => {
+        }
+      });
+      }
+    //}
 
   }
   onMainItemEditCancel(row: MainItemServiceInvoice, index: number) {
@@ -383,8 +465,8 @@ export class ServiceInvoiceComponent {
       accept: () => {
 
         const saveRequests = this.serviceInvoiceRecords.map((item) => ({
-          executionOrderMain: item.executionOrderMain,
-          executionOrderMainCode: item.executionOrderMainCode,
+          executionOrderMain: item.executionOrderMain, // as an object 
+          executionOrderMainCode: item.executionOrderMainCode, // code
 
 
           refrenceId: this.documentNumber,
@@ -574,7 +656,6 @@ export class ServiceInvoiceComponent {
   }
   // For Add new  Main Item
   addMainItem() {
-
     if (this.executionOrderWithlineNumber) {
       console.log(this.executionOrderWithlineNumber);
       const newRecord: MainItemServiceInvoice = {
@@ -1077,7 +1158,8 @@ export class ServiceInvoiceComponent {
     doNotPrint: false,
     quantity: 0,
 
-    executionOrderMain: undefined
+    executionOrderMain: undefined,
+    //debitMemoRequestItemText:"",
   };
   resetNewMainItem() {
     this.newMainItem = {
@@ -1111,7 +1193,8 @@ export class ServiceInvoiceComponent {
       lotCostOne: false,
       doNotPrint: false,
       quantity: 0,
-      executionOrderMain: undefined
+      executionOrderMain: undefined,
+      //debitMemoRequestItemText:"",
     }
   }
 
