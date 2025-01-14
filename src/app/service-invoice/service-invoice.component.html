@@ -2,7 +2,7 @@
     <p-toast></p-toast>
     <p-toolbar>
         <div class="p-toolbar-group-start">
-            <h6>{{itemText}}</h6>
+            <h5>{{itemText}}</h5>
         </div>
         <div class="p-toolbar-group-end">
             <!-- <button pButton pRipple icon="pi pi-copy" (click)="copyRecord()" class="p-button-rounded m-2"></button> -->
@@ -27,7 +27,7 @@
                 {{totalValue | currency }}
             </div>
             <div class="col-2 col-sm-4 border">
-                SAR
+              {{cloudCurrency}}
             </div>
         </div>
     </div>
@@ -171,9 +171,11 @@
                 <p-cellEditor>
                     <ng-template pTemplate="input">
                         {{ mainItem.currencyCode }}
+                        <!-- {{cloudCurrency}} -->
                     </ng-template>
                     <ng-template pTemplate="output">
                         {{ mainItem.currencyCode }}
+                        <!-- {{cloudCurrency}} -->
                     </ng-template>
                 </p-cellEditor>
             </td>
@@ -410,7 +412,8 @@
                     {{mainItem.currencyCode}}
                 </td>
                 <td style="min-width: 10rem;">
-                    {{mainItem.total}}
+                    <!-- {{mainItem.total}} -->
+                     {{(mainItem.serviceQuantity??0)*(mainItem.amountPerUnit??0)}}
                 </td>
                 <td style="min-width: 10rem;">
                     {{mainItem.totalQuantity}}
@@ -517,7 +520,8 @@
             </td>
             <td style="min-width: 10rem;">
                 <ng-container *ngIf="executionOrderWithlineNumber">
-                    {{executionOrderWithlineNumber.total}}
+                    <!-- {{executionOrderWithlineNumber.total}} -->
+                     {{((executionOrderWithlineNumber.serviceQuantity??0)*(executionOrderWithlineNumber.amountPerUnit??0))}}
                 </ng-container>
             </td>
             <td style="min-width: 10rem;">
@@ -634,11 +638,10 @@
 <p-dialog header="Select Rows to Copy:" class="header-color" [(visible)]="displayExecutionOrderDialog" [modal]="true"
     [style]="{width: '70vw'}" [responsive]="true">
  
-    <div class="flex align-items-center justify-content-between">
+    <!-- <div class="flex align-items-center justify-content-between">
     <button pButton type="button" label="Enter Document Number" (click)="openDocumentDialog()" style="margin-bottom: 10px;" class="rounded-input"></button>
-    <!-- <p-button icon="pi pi-refresh"  (onClick)="getExecutionOrders()" /> -->
     <button  pButton type="button" icon="pi pi-refresh"  (click)="getExecutionOrders()" style="margin-bottom: 10px;"  class="rounded-input"></button>
-    </div>
+    </div> -->
     <p-table [value]="executionOrders" selectionMode="multiple" [(selection)]="selectedExecutionOrders"
         dataKey="executionOrderMainCode">
 
@@ -694,7 +697,7 @@
 </p-dialog>
 
 <!-- Nested Dialog for Document Number Input -->
-<p-dialog header="Enter Document Number" [(visible)]="displayExecutionDocumentDialog" [modal]="true" [style]="{width: '30vw'}" [responsive]="true">
+<!-- <p-dialog header="Enter Document Number" [(visible)]="displayExecutionDocumentDialog" [modal]="true" [style]="{width: '30vw'}" [responsive]="true">
     <div class="flex align-items-center justify-content-between">
     <div class="p-field">
         <label for="executionDocumentNumber">Document Number:</label>
@@ -706,7 +709,7 @@
         <button pButton type="button" (click)="getExecutionOrdersByDocument()" style="border-radius: 8px; margin-right: 3px;" label="Fetch"></button>
         <button pButton type="button" (click)="displayExecutionDocumentDialog = false" style="border-radius: 8px;" label="Cancel" class="p-button-secondary"></button>
     </p-footer>
-</p-dialog>
+</p-dialog> -->
 
 
 <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

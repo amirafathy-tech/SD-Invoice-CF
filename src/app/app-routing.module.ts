@@ -11,13 +11,17 @@ import { CloudDataComponent } from './cloud-data/cloud-data.component';
 
 const routes: Routes = [
    { path: '', component: HomePageComponent },
-  // { path: '', redirectTo: '/home', pathMatch: 'full' }, 
+  // // { path: '', redirectTo: '/home', pathMatch: 'full' }, 
   { path: 'home', component: HomePageComponent },
   { path: 'login', component: AuthComponent },
   { path: 'service-invoice',canActivate:[AuthGuard], component: ServiceInvoiceComponent },
-  
+
   { path: 'service-invoice-data',canActivate:[AuthGuard], component: CloudDataComponent },
   //data: { role: ['Admin', 'Manager'] } // for auth role:
+  // !Without Security::
+  // { path: '', component: CloudDataComponent },
+  // { path: 'service-invoice', component: ServiceInvoiceComponent },
+  // { path: 'service-invoice-data', component: CloudDataComponent },
 ];
 
 @NgModule({
