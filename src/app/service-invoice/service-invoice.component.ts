@@ -117,7 +117,8 @@ export class ServiceInvoiceComponent {
       this.serviceInvoiceRecords = [...this._ServiceInvoiceService.getMainItems()];
       console.log(this.serviceInvoiceRecords);
     }
-    this._ApiService.get<MainItemServiceInvoice[]>(`serviceinvoice/referenceid?referenceId=${this.documentNumber}`).subscribe({
+    //localhost:8080/serviceinvoice/referenceid?referenceId=70000009&debitMemoRequestItem=10
+    this._ApiService.get<MainItemServiceInvoice[]>(`serviceinvoice/referenceid?referenceId=${this.documentNumber}&debitMemoRequestItem=${this.itemNumber}`).subscribe({
       next: (res) => {
         this.serviceInvoiceRecords = res.sort((a, b) => a.serviceInvoiceCode - b.serviceInvoiceCode);
         this.itemText = this.serviceInvoiceRecords[0].debitMemoRequestItemText ? this.serviceInvoiceRecords[0].debitMemoRequestItemText : "";
