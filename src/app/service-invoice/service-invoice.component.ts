@@ -65,7 +65,8 @@ export class ServiceInvoiceComponent {
   showExecutionOrderDialog() {
     this.displayExecutionOrderDialog = true;
     // Fetch data based on document number and update the table
-    this._ApiService.get<MainItemExecutionOrder[]>(`executionordermain?debitMemoRequest=${this.documentNumber}`).subscribe({
+    //localhost:8080/executionordermain?debitMemoRequest=70000001&debitMemoRequestItem=10
+    this._ApiService.get<MainItemExecutionOrder[]>(`executionordermain?debitMemoRequest=${this.documentNumber}&debitMemoRequestItem=${this.itemNumber}`).subscribe({
       next: (res) => {
         this.executionOrders = res.sort((a, b) => a.executionOrderMainCode - b.executionOrderMainCode);
         console.log(this.executionOrders);
