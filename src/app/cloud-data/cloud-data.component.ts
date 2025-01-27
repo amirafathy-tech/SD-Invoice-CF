@@ -42,7 +42,11 @@ export class CloudDataComponent {
     this._ApiService.get<any>(`serviceinvoice/${this.cloudData.value.document}`).subscribe(response => {
       console.log(response);
       console.log(response.d.results);
-      this.documentItems=response.d.results;
+      console.log(this.documentItems); 
+     // this.documentItems=response.d.results;
+     this.documentItems = response.d.results.sort((a: { SalesQuotationItem: string }, b: { SalesQuotationItem: string }) => {
+      return parseInt(a.SalesQuotationItem, 10) - parseInt(b.SalesQuotationItem, 10);
+    });
       console.log(this.documentItems); 
       this.customerId=response.d.SoldToParty;
      });

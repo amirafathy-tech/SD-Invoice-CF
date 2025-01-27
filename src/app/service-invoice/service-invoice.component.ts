@@ -115,7 +115,8 @@ export class ServiceInvoiceComponent {
   ngOnInit() {
     console.log(this.selectedServiceInvoice);
     if (this.savedInMemory) {
-      this.serviceInvoiceRecords = [...this._ServiceInvoiceService.getMainItems()];
+     // this.serviceInvoiceRecords = [...this._ServiceInvoiceService.getMainItems()];
+     this.serviceInvoiceRecords = [...this.serviceInvoiceRecords];
       console.log(this.serviceInvoiceRecords);
     }
     //localhost:8080/serviceinvoice/referenceid?referenceId=70000009&debitMemoRequestItem=10
@@ -494,7 +495,7 @@ export class ServiceInvoiceComponent {
     //}
   }
   // For Add new  Main Item
-  addMainItem() {
+  addMainItemInMemory() {
     if (this.executionOrderWithlineNumber) {
       console.log(this.executionOrderWithlineNumber);
       const newRecord: MainItemServiceInvoice = {
@@ -577,15 +578,17 @@ export class ServiceInvoiceComponent {
             ) as MainItemServiceInvoice;
             console.log(filteredRecord);
             ///.................
-            this._ServiceInvoiceService.addMainItem(filteredRecord);
+           // this._ServiceInvoiceService.addMainItem(filteredRecord);
+           this.addMainItem(filteredRecord);
+           this.serviceInvoiceRecords = [...this.serviceInvoiceRecords];
             this.savedInMemory = true;
             // this.cdr.detectChanges();
-            const newMainItems = this._ServiceInvoiceService.getMainItems();
-            // Combine the current mainItemsRecords with the new list, ensuring no duplicates
-            this.serviceInvoiceRecords = [
-              ...this.serviceInvoiceRecords.filter(item => !newMainItems.some(newItem => newItem.serviceInvoiceCode === item.serviceInvoiceCode)), // Remove existing items
-              ...newMainItems
-            ];
+            // const newMainItems = this._ServiceInvoiceService.getMainItems();
+            // // Combine the current mainItemsRecords with the new list, ensuring no duplicates
+            // this.serviceInvoiceRecords = [
+            //   ...this.serviceInvoiceRecords.filter(item => !newMainItems.some(newItem => newItem.serviceInvoiceCode === item.serviceInvoiceCode)), // Remove existing items
+            //   ...newMainItems
+            // ];
             this.updateTotalValueAfterAction();
             console.log(this.serviceInvoiceRecords);
             this.resetNewMainItem();
@@ -690,18 +693,20 @@ export class ServiceInvoiceComponent {
             })
           ) as MainItemServiceInvoice;
           console.log(filteredRecord);
-          this._ServiceInvoiceService.addMainItem(filteredRecord);
+          //this._ServiceInvoiceService.addMainItem(filteredRecord);
+          this.addMainItem(filteredRecord);
+          this.serviceInvoiceRecords = [...this.serviceInvoiceRecords];
 
           this.savedInMemory = true;
           this.cdr.detectChanges();
 
-          const newMainItems = this._ServiceInvoiceService.getMainItems();
+          // const newMainItems = this._ServiceInvoiceService.getMainItems();
 
-          // Combine the current mainItemsRecords with the new list, ensuring no duplicates
-          this.serviceInvoiceRecords = [
-            ...this.serviceInvoiceRecords.filter(item => !newMainItems.some(newItem => newItem.serviceInvoiceCode === item.serviceInvoiceCode)), // Remove existing items
-            ...newMainItems
-          ];
+          // // Combine the current mainItemsRecords with the new list, ensuring no duplicates
+          // this.serviceInvoiceRecords = [
+          //   ...this.serviceInvoiceRecords.filter(item => !newMainItems.some(newItem => newItem.serviceInvoiceCode === item.serviceInvoiceCode)), // Remove existing items
+          //   ...newMainItems
+          // ];
 
           this.updateTotalValueAfterAction();
 
@@ -998,5 +1003,12 @@ export class ServiceInvoiceComponent {
   //   });
 
   // }
+
+  // Memory operation:
+  addMainItem(item: MainItemServiceInvoice) {
+    item.serviceInvoiceCode = this.serviceInvoiceRecords.length + 1;
+    this.serviceInvoiceRecords.push(item);
+    console.log(this.serviceInvoiceRecords);
+  }
 
 }

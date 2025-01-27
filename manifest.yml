@@ -1,6 +1,7 @@
 applications:
-  - name: service-invoice-app
-    buildpack: staticfile_buildpack
-    memory: 300MB
-    instances: 1
-    path: dist/btp-sd-app
+- name: Service-Invoice-test
+  instances: 1
+  memory: 512MB
+  buildpacks:
+    - staticfile_buildpack
+  path: /dist/btp-sd-app  

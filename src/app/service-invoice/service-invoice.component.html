@@ -533,7 +533,7 @@
             <td style="min-width: 10rem;">
                 <ng-container *ngIf="executionOrderWithlineNumber">
                     <input pInputNumber name="serviceQuantity" type="number" [min]="0"
-                    (keyup.enter)="addMainItem()"   [(ngModel)]="executionOrderWithlineNumber.serviceQuantity" class="rounded-input">
+                    (keyup.enter)="addMainItemInMemory()"   [(ngModel)]="executionOrderWithlineNumber.serviceQuantity" class="rounded-input">
                 </ng-container>
             </td>
             <!-- Remaining  Quantity will be changed -->
@@ -625,7 +625,7 @@
             </td>
             <td style="min-width: 10rem;">
                 <button pButton type="button" icon="pi pi-plus" class="ui-button-info" label="Add"
-                style=" border-radius: 8px; " (click)="addMainItem()">
+                style=" border-radius: 8px; " (click)="addMainItemInMemory()">
                 </button>
             </td>
         </tr>
