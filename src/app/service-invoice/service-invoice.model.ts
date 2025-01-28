@@ -1,4 +1,5 @@
 export class MainItemServiceInvoice {
+    originalIndex?: number;
 
     referenceId?:number;
 

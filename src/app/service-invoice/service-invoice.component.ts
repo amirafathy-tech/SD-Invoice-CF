@@ -122,7 +122,9 @@ export class ServiceInvoiceComponent {
     //localhost:8080/serviceinvoice/referenceid?referenceId=70000009&debitMemoRequestItem=10
     this._ApiService.get<MainItemServiceInvoice[]>(`serviceinvoice/referenceid?referenceId=${this.documentNumber}&debitMemoRequestItem=${this.itemNumber}`).subscribe({
       next: (res) => {
-        this.serviceInvoiceRecords = res.sort((a, b) => a.serviceInvoiceCode - b.serviceInvoiceCode);
+        console.log(res);
+        this.serviceInvoiceRecords = res.map((item, index) => ({ ...item, originalIndex: index + 1 }))
+        .sort((a, b) => a.serviceInvoiceCode - b.serviceInvoiceCode);
         this.itemText = this.serviceInvoiceRecords[0].debitMemoRequestItemText ? this.serviceInvoiceRecords[0].debitMemoRequestItemText : "";
         console.log(this.itemText);
         console.log(this.serviceInvoiceRecords);
@@ -384,6 +386,11 @@ export class ServiceInvoiceComponent {
           for (const record of this.selectedServiceInvoice) {
             console.log(record);
             this.serviceInvoiceRecords = this.serviceInvoiceRecords.filter(item => item.serviceInvoiceCode !== record.serviceInvoiceCode);
+              // Reassign originalIndex dynamically
+              this.serviceInvoiceRecords.forEach((item, index) => {
+                item.originalIndex = index + 1; 
+              });
+              this.serviceInvoiceRecords = [...this.serviceInvoiceRecords];
             this.updateTotalValueAfterAction();
             //this.cdr.detectChanges();
             console.log(this.serviceInvoiceRecords);
@@ -499,6 +506,7 @@ export class ServiceInvoiceComponent {
     if (this.executionOrderWithlineNumber) {
       console.log(this.executionOrderWithlineNumber);
       const newRecord: MainItemServiceInvoice = {
+        originalIndex: this.serviceInvoiceRecords.length + 1,
 
         executionOrderMainCode: this.executionOrderWithlineNumber.executionOrderMainCode,
         executionOrderMain: undefined,
@@ -609,6 +617,8 @@ export class ServiceInvoiceComponent {
   saveMainItem(mainItem: MainItemExecutionOrder) {
     console.log(mainItem);
     const newRecord: MainItemServiceInvoice = {
+      originalIndex: this.serviceInvoiceRecords.length + 1,
+
       executionOrderMainCode: mainItem.executionOrderMainCode,
       executionOrderMain: undefined,
       //executionOrderMain: mainItem,
